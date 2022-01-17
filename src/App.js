@@ -8,12 +8,8 @@ function App() {
   return (
     <ProductoProvider>
       <div className="row mt-5 container">
-        <div className="col-md-4">
           <Formulario/>
-        </div>
-        <div className="col-md-8">
           <ListarProductos/>
-        </div>
       </div>
     </ProductoProvider>
   );

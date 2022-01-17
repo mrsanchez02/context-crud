@@ -3,7 +3,7 @@ import ProductoContext from '../context/ProductoContext'
 
 const Producto = ({producto}) => {
 
-    const {editar, eliminar, comprar} = useContext(ProductoContext);
+    const {setActualizar, eliminar, comprar} = useContext(ProductoContext);
 
     const {id, nombre, cantidad, comprado}=producto;
 
@@ -19,7 +19,10 @@ const Producto = ({producto}) => {
                     >{comprado?'Comprado 😀!':'No comprado ☹!'}</button>
                     <button
                         className='btn btn-secondary btn-sm'
-                        onClick={()=>editar(id)}
+                        onClick={()=>{
+                            if(comprado)return;
+                            setActualizar({update:true,product:producto})
+                        }}
                     >Editar</button>
                     <button
                         className='btn btn-danger btn-sm'

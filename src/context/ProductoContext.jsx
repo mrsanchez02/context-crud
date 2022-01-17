@@ -2,25 +2,6 @@ import React,{createContext,useState} from 'react';
 
 const ProductoContext = createContext();
 
-const initialList = [
-    {
-        id:1,
-        nombre:'Spagetti',
-        cantidad:4,
-        comprado:false
-    },{
-        id:2,
-        nombre:'Aceite Oliva',
-        cantidad:2,
-        comprado:true
-    },{
-        id:3,
-        nombre:'Ajo',
-        cantidad:3,
-        comprado:false
-}   
-]
-
 const ProductoProvider = ({children}) => {
 
     const [producto, setProducto] = useState({
@@ -31,21 +12,36 @@ const ProductoProvider = ({children}) => {
     })
     
     const [lista,setLista]=useState([]);
+    const [actualizar,setActualizar]=useState({update:false,product:''});
     const [error,setError]=useState(false);
 
-    const editar = id => {
-        console.log('Editando',id);
+    const modificar = producto => {
+        if(actualizar.update){
+            const nuevaLista = lista.map(productoLista => {
+                if(productoLista.id===producto.id){
+                    productoLista.nombre=producto.nombre;
+                    productoLista.cantidad=producto.cantidad;
+                }
+                return productoLista;
+            })
+            setLista(nuevaLista);
+            setActualizar({update:false,product:''});
+            return;
+        }
+        setLista([...lista,producto]);
     }
 
     const eliminar = id => {
-        
-        console.log('Eliminando',id);
+        const nuevaListafiltrada = lista.filter(producto => producto.id!==id);
+        setLista(nuevaListafiltrada);
     }
 
     const comprar = id => {
-        const filtrar = lista.filter(producto => producto.id===id);
-        console.log('Comprando',id);
-        console.log(filtrar);
+        const nuevaLista = lista.map(producto => {
+            if(producto.id===id) producto.comprado = !producto.comprado
+            return producto;
+        })   
+        setLista(nuevaLista);
     }
 
     return (
@@ -56,9 +52,11 @@ const ProductoProvider = ({children}) => {
             setProducto,
             error,
             setError,
-            editar,
+            modificar,
             eliminar,
-            comprar
+            comprar,
+            setActualizar,
+            actualizar
         }}>
             {children}
         </ProductoContext.Provider>

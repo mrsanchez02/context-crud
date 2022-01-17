@@ -1,14 +1,35 @@
-import React, { useContext } from 'react'
+import React, { useContext,useRef,useEffect } from 'react'
 import shortid from 'shortid';
 import ProductoContext from '../context/ProductoContext'
 
 const Formulario = () => {
 
-    const {producto,setProducto,setLista,error,setError,lista} = useContext(ProductoContext);
+    const nombreRef = useRef(null);
+    const cantidadRef = useRef(null);
+
+    const {producto,setProducto,error,setError,modificar,actualizar} = useContext(ProductoContext);
     const {nombre,cantidad}=producto;
+    const {update,product}=actualizar;
+
+    useEffect(()=>{
+        product.nombre && (nombreRef.current.value = product.nombre)
+        product.cantidad && (cantidadRef.current.value = product.cantidad)
+        product.nombre && (nombreRef.current.focus())
+    },[update,product])
 
     const handleSubmit = e => { 
         e.preventDefault();
+        if(update){
+            // Validar
+            if(nombre.trim()===''||cantidad.trim()===''||isNaN(cantidad)){
+                setError(true);
+                return
+            }
+
+            modificar(producto)    
+            nombreRef.current.value=''
+            cantidadRef.current.value=''
+        }
         
         // Validar
         if(nombre.trim()===''||cantidad.trim()===''||isNaN(cantidad)){
@@ -18,16 +39,25 @@ const Formulario = () => {
         setError(false);
         
         producto.id = shortid.generate();
-        setLista([...lista,producto]);
+        modificar(producto)
         setProducto({
             id:'',
             nombre:'',
-            cantidad:'',
+            cantidad:0,
             comprado:false
         })
+
+        nombreRef.current.value=''
+        cantidadRef.current.value=''
     }
 
     const handleChange = e => {
+
+        if(update){
+            product.nombre=nombreRef.current.value;
+            product.cantidad=cantidadRef.current.value;
+        }
+
         setProducto({
             ...producto,
             [e.target.name]:e.target.value
@@ -42,6 +72,7 @@ const Formulario = () => {
             <form onSubmit={handleSubmit}>
                 <div className="form-floating mb-3">
                     <input 
+                        ref={nombreRef}
                         type="text" 
                         placeholder='Queso...' 
                         id='nombre' 
@@ -54,6 +85,7 @@ const Formulario = () => {
                 </div>
                 <div className="form-floating mb-3">
                     <input 
+                        ref={cantidadRef}
                         type="number" 
                         placeholder='2' 
                         name="cantidad" 
